@@ -1,0 +1,12 @@
+{
+	"id": "AllMemory",
+	"name": "All Memory",
+	"display_name": "All Memory",
+	"author": ["senfinbrare"],
+	"description": "Configurable challenge mod for turning off parts of Balatro's UI",
+	"prefix": "allm",
+	"main_file": "main.lua",
+	"priority": 0,
+	"version": "0.1.0",
+	"dependencies": []
+}
