@@ -1,0 +1,113 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 5
+
+# hide lives
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/game.lua"]'''
+pattern = '''string = { { ref_table = MP.GAME, ref_value = "lives" } },'''
+position = "at"
+payload = '''string = { allm_hide('ante') and '?' or { ref_table = MP.GAME, ref_value = "lives" } },'''
+match_indent = true
+
+# hide timer
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/hud.lua"]'''
+pattern = '''string = { { ref_table = MP.GAME, ref_value = "timer" } },'''
+position = "at"
+payload = '''string = { allm_hide('ante') and '??' or { ref_table = MP.GAME, ref_value = "timer" } },'''
+match_indent = true
+
+
+
+
+# player blind row settings
+# hide opp score req
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/hud.lua"]'''
+pattern = '''highest_score = MP.GAME.highest_score
+end'''
+position = "after"
+payload = '''
+if allm_hide('ante') then
+	lives = '?'
+end
+if (type == "host" and MP.LOBBY.is_host) or (type == "guest" and not MP.LOBBY.is_host) then
+	if allm_hide('score') then
+		highest_score = '????'
+	end
+else
+	if allm_hide('requirements') then
+		highest_score = '????'
+	end
+end
+	
+'''
+match_indent = true
+
+# breh
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "misc/insane_int.lua"]'''
+pattern = '''MP.INSANE_INT.to_string = function(insane_int_display)'''
+position = "after"
+payload = '''if type(insane_int_display) == 'string' then return insane_int_display end'''
+match_indent = true
+
+
+
+
+# hide blind select score reqs again
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/game.lua"]'''
+pattern = '''
+local blind_amt = get_blind_amount(G.GAME.round_resets.blind_ante)
+	* blind_choice.config.mult
+	* G.GAME.starting_params.ante_scaling
+'''
+position = "after"
+payload = '''blind_amt = allm_hide('requirements') and '????' or blind_amt'''
+match_indent = true
+
+# hide nemesis blind score
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/game.lua"]'''
+pattern = '''G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"'''
+position = "before"
+payload = '''
+if allm_hide('requirements') then
+	G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.GAME
+	G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "allm_question_big"
+end
+'''
+match_indent = true
+
+# hide hands because whatever
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS Multiplayer "ui/game.lua"]'''
+pattern = '''{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }'''
+position = "at"
+payload = '''
+{ allm_hide('hands_discards') and { ref_table = G.GAME, ref_value = "allm_question_small" } or { ref_table = MP.GAME.enemy, ref_value = "hands" } }
+'''
+match_indent = true
+
+# hide score on cashout (what even is this one dawg)
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''function add_round_eval_row(config)'''
+position = "after"
+payload = '''
+if allm_hide('requirements') then
+	G.GAME.blind.chip_text = '????'
+end
+'''
+match_indent = true
